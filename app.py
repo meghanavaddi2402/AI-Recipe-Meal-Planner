@@ -42,7 +42,7 @@ INDEX_PATH = os.path.join(
 )
 
 MAX_RECIPES = 3000
-TOP_K = 5
+TOP_K = 10
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -459,12 +459,18 @@ def get_llm_client():
 
 def retrieve_recipes(question, vector_store):
 
-    print("DEBUG: Searching the recipe database...")
+    print("\nDEBUG: Searching the recipe database...")
+    print("DEBUG: User question:", question)
 
     results = vector_store.similarity_search(
         question,
         k=TOP_K
     )
+
+    print("\nDEBUG: Retrieved recipe names:")
+
+    for document in results:
+        print("-", document.metadata.get("recipe_name"))
 
     unique_recipes = []
     seen_ids = set()
@@ -480,7 +486,7 @@ def retrieve_recipes(question, vector_store):
         unique_recipes.append(document)
 
     print(
-        f"DEBUG: Retrieved {len(unique_recipes)} unique recipes."
+        f"\nDEBUG: Retrieved {len(unique_recipes)} unique recipes."
     )
 
     return unique_recipes
