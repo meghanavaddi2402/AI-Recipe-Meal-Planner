@@ -15,3 +15,6 @@ recipes/reviews.parquet
 
 # Generated FAISS indexes
 recipes/faiss_index*/
+
+# Temporary Indian recipe extraction files
+recipes/indian_recipes.parquet

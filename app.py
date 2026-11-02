@@ -32,16 +32,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(
     BASE_DIR,
     "recipes",
-    "recipes_small.parquet"
+    "recipes_combined.parquet"
 )
 
 INDEX_PATH = os.path.join(
     BASE_DIR,
     "recipes",
-    "faiss_index"
+    "faiss_index_combined"
 )
 
-MAX_RECIPES = 2000
+MAX_RECIPES = 3000
 TOP_K = 5
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
