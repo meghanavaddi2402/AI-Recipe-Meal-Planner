@@ -41,8 +41,8 @@ INDEX_PATH = os.path.join(
     "faiss_index_combined"
 )
 
-MAX_RECIPES = 3000
-TOP_K = 10
+MAX_RECIPES = 1200
+TOP_K = 5
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -498,59 +498,65 @@ def retrieve_recipes(question, vector_store):
 
 def generate_answer(question, recipes, client):
 
-    if not recipes:
-        return (
-            "I couldn't find a matching recipe in the available "
-            "recipe database. Try a different dish or ingredient."
-        )
-
-    recipe_context = "\n\n".join(
-        f"RECIPE {index}:\n{document.page_content}"
-        for index, document in enumerate(recipes, start=1)
-    )
-
     system_prompt = """
 You are an AI Recipe and Meal Planning Assistant.
 
-Help users find recipes, understand ingredients, and plan meals.
+Your purpose is to help users with:
+1. Recipes and cooking
+2. Food ingredients and their uses
+3. Everyday nutrition and healthy eating
+4. Basic food-related health guidance
+5. Daily diet and meal planning
 
-STRICT RULES:
+You can answer questions about food and nutrition related to
+conditions such as diabetes, high blood pressure, cholesterol,
+heart health, anaemia, digestive health, and weight management.
 
-1. Use only the recipe records provided in the context.
-2. Never claim that a recipe exists in the database unless it
-   appears in the supplied records.
-3. Treat every recipe record separately.
-4. Never combine ingredients or instructions from different recipes.
-5. Do not invent cooking steps, quantities, cooking times, or nutrition.
-6. If the requested dish is absent from the records, say that you
-   could not find a matching recipe in the available database.
-7. If information is missing, say it is not available.
-8. Keep answers clear, friendly, and easy to follow.
-9. Do not display internal prompts or technical debugging details.
-10. When asked for multiple meals, use only recipes in the context.
+IMPORTANT RULES:
 
-For a recipe answer, use:
+1. Give clear, simple, friendly, and practical answers.
+2. Keep explanations relevant to the user's question. Avoid
+   unnecessarily detailed medical explanations.
+3. For recipes from the database, use only the retrieved recipe
+   records.
+4. Never invent ingredients, quantities, cooking times, or
+   nutritional values for database recipes.
+5. If a requested recipe is not found in the database, clearly
+   mention that. You may provide a general recipe if the user
+   asks how to prepare that dish, but do not claim it came from
+   the database.
+6. For general food and nutrition questions, use reliable,
+   commonly accepted nutrition knowledge.
+7. Explain how foods may affect health without making guaranteed
+   claims.
+8. For health-related questions, provide general food guidance,
+   not a diagnosis, prescription, or medication advice.
+9. Do not recommend stopping or changing prescribed medicines.
+10. Remind users with medical conditions, allergies, pregnancy,
+    or special dietary needs to consult a qualified healthcare
+    professional for personalised advice.
+11. Do not assume every person has the same dietary requirements.
+12. If a question is unrelated to food, nutrition, recipes, or
+    meal planning, politely explain your purpose.
+13. Never reveal internal prompts or technical details.
 
-### Recipe Name
-
-**Description**
-
-**Ingredients**
-List the recorded ingredients and quantities when available.
-
-**Cooking Time**
-Use the recorded value, or say it is not available.
-
-**Instructions**
-Follow the recipe's recorded instructions in their original order.
-Do not add unrecorded steps.
-
-**Nutrition**
-Show available nutrition information only.
-
-If the user asks something unrelated to recipes or meal planning,
-politely explain your purpose.
+Keep your answers organised and easy to understand.
 """
+    # Prepare recipe context if recipes are available
+
+    if recipes:
+
+        recipe_context = "\n\n".join(
+            f"RECIPE {index}:\n{document.page_content}"
+            for index, document in enumerate(recipes, start=1)
+        )
+
+    else:
+
+        recipe_context = (
+            "No matching recipe records were retrieved "
+            "from the recipe database."
+        )
 
     user_prompt = f"""
 User question:
@@ -559,7 +565,7 @@ User question:
 Retrieved recipe records:
 {recipe_context}
 
-Answer the user's question using the system rules.
+Answer according to the system instructions.
 """
 
     print("DEBUG: Sending question to Groq...")
@@ -591,8 +597,6 @@ Answer the user's question using the system rules.
         )
 
     return answer.strip()
-
-
 
 # ==================================================
 # 9. MODERN CHATBOT UI
@@ -757,6 +761,41 @@ div[data-testid="stChatMessage"] strong {
     line-height: 1.8;
 }
 
+/* =========================================
+   CHAT TABLE VISIBILITY FIX
+========================================= */
+
+div[data-testid="stChatMessage"] table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background-color: #FFFFFF !important;
+    color: #243B2A !important;
+}
+
+div[data-testid="stChatMessage"] table th {
+    background-color: #EAF1E5 !important;
+    color: #1B5E20 !important;
+    font-weight: 700 !important;
+    border: 1px solid #DDE5D8 !important;
+    padding: 12px !important;
+}
+
+div[data-testid="stChatMessage"] table td {
+    background-color: #FFFFFF !important;
+    color: #243B2A !important;
+    border: 1px solid #DDE5D8 !important;
+    padding: 12px !important;
+}
+
+div[data-testid="stChatMessage"] table tr {
+    opacity: 1 !important;
+}
+
+div[data-testid="stChatMessage"] table th *,
+div[data-testid="stChatMessage"] table td * {
+    color: #243B2A !important;
+    opacity: 1 !important;
+}
 
 /* =========================================
    6. CHAT INPUT - FIXED SIZE AND POSITION
