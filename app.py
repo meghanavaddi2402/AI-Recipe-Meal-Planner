@@ -975,6 +975,7 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
+
     st.divider()
 
     if st.button(
@@ -983,6 +984,7 @@ with st.sidebar:
         type="primary"
     ):
         st.session_state.messages = []
+        st.session_state.suggestion = None
         st.rerun()
 
     st.markdown("### Explore")
