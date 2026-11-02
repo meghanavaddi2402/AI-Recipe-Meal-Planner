@@ -1,0 +1,17 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Original large datasets
+recipes/*.csv
+recipes/recipes.parquet
+recipes/reviews.parquet
+
+# Generated FAISS indexes
+recipes/faiss_index*/
