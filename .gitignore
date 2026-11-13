@@ -1,0 +1,15 @@
+# Secrets and virtual environments
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated FAISS index
+recipes/faiss_index_combined/
+
+# Local logs and editor files
+*.log
+.vscode/
+.idea/
